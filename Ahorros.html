@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Million Euro Savings with Interest</title>
+  <style>
+    body { font-family: Arial; margin: 40px; background: #f4f4f4; }
+    h1 { color: #2c3e50; }
+    label { display: block; margin-top: 15px; }
+    input { padding: 8px; width: 200px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer; }
+    #result { margin-top: 30px; font-size: 1.2em; color: #27ae60; }
+  </style>
+</head>
+<body>
+  <h1>📈 Million Euro Savings Calculator</h1>
+
+  <label for="initial">Initial Deposit (€):</label>
+  <input type="number" id="initial" placeholder="e.g. 10000">
+
+  <label for="monthly">Monthly Savings (€):</label>
+  <input type="number" id="monthly" placeholder="e.g. 1500">
+
+  <label for="interest">Annual Interest Rate (%):</label>
+  <input type="number" id="interest" placeholder="e.g. 5">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const initial = parseFloat(document.getElementById('initial').value) || 0;
+      const monthly = parseFloat(document.getElementById('monthly').value) || 0;
+      const annualRate = parseFloat(document.getElementById('interest').value) || 0;
+      const target = 1000000;
+
+      if (monthly <= 0 || annualRate < 0) {
+        document.getElementById('result').innerText = "Please enter valid values.";
+        return;
+      }
+
+      let total = initial;
+      let months = 0;
+      const monthlyRate = annualRate / 100 / 12;
+
+      while (total < target) {
+        total += monthly;
+        total *= (1 + monthlyRate);
+        months++;
+        if (months > 1000 * 12) break; // safety limit
+      }
+
+      const years = Math.floor(months / 12);
+      const remainingMonths = months % 12;
+
+      document.getElementById('result').innerText =
+        `With ${annualRate}% annual interest, you'll reach €1,000,000 in about ${years} years and ${remainingMonths} months. 🚀`;
+    }
+  </script>
+</body>
+</html>
