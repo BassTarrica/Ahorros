@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Million Euro Savings with Interest & Chart</title>
+  <title>Custom Savings Goal Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: Arial; margin: 40px; background: #f4f4f4; }
@@ -15,7 +15,7 @@
   </style>
 </head>
 <body>
-  <h1>📈 Million Euro Savings Calculator</h1>
+  <h1>📈 Savings Goal Calculator</h1>
 
   <label for="initial">Initial Deposit (€):</label>
   <input type="number" id="initial" placeholder="e.g. 10000">
@@ -25,6 +25,9 @@
 
   <label for="interest">Annual Interest Rate (%):</label>
   <input type="number" id="interest" placeholder="e.g. 5">
+
+  <label for="target">Target Amount (€):</label>
+  <input type="number" id="target" placeholder="e.g. 1000000">
 
   <button onclick="calculate()">Calculate</button>
 
@@ -39,10 +42,10 @@
       const initial = parseFloat(document.getElementById('initial').value) || 0;
       const monthly = parseFloat(document.getElementById('monthly').value) || 0;
       const annualRate = parseFloat(document.getElementById('interest').value) || 0;
-      const target = 1000000;
+      const target = parseFloat(document.getElementById('target').value) || 1000000;
       const monthlyRate = annualRate / 100 / 12;
 
-      if (monthly <= 0 || annualRate < 0) {
+      if (monthly <= 0 || annualRate < 0 || target <= 0) {
         document.getElementById('result').innerText = "Please enter valid values.";
         return;
       }
@@ -70,10 +73,9 @@
       const remainingMonths = months % 12;
 
       document.getElementById('result').innerText =
-        `With ${annualRate}% annual interest, you'll reach €1,000,000 in about ${years} years and ${remainingMonths} months. 🚀`;
+        `With ${annualRate}% annual interest, you'll reach €${target.toLocaleString()} in about ${years} years and ${remainingMonths} months. 🎯`;
 
-      // Draw chart
-      if (chart) chart.destroy(); // clear previous chart
+      if (chart) chart.destroy();
 
       const ctx = document.getElementById('savingsChart').getContext('2d');
       chart = new Chart(ctx, {
