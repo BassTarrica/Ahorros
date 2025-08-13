@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Million Euro Savings with Interest</title>
+  <title>Million Euro Savings with Interest & Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: Arial; margin: 40px; background: #f4f4f4; }
     h1 { color: #2c3e50; }
@@ -10,6 +11,7 @@
     input { padding: 8px; width: 200px; margin-top: 5px; }
     button { margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer; }
     #result { margin-top: 30px; font-size: 1.2em; color: #27ae60; }
+    canvas { margin-top: 40px; background: white; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
@@ -28,12 +30,17 @@
 
   <div id="result"></div>
 
+  <canvas id="savingsChart" width="800" height="400"></canvas>
+
   <script>
+    let chart;
+
     function calculate() {
       const initial = parseFloat(document.getElementById('initial').value) || 0;
       const monthly = parseFloat(document.getElementById('monthly').value) || 0;
       const annualRate = parseFloat(document.getElementById('interest').value) || 0;
       const target = 1000000;
+      const monthlyRate = annualRate / 100 / 12;
 
       if (monthly <= 0 || annualRate < 0) {
         document.getElementById('result').innerText = "Please enter valid values.";
@@ -41,14 +48,22 @@
       }
 
       let total = initial;
+      let rawContributions = initial;
       let months = 0;
-      const monthlyRate = annualRate / 100 / 12;
 
-      while (total < target) {
+      const labels = [];
+      const totalData = [];
+      const interestData = [];
+
+      while (total < target && months < 1000 * 12) {
+        months++;
+        rawContributions += monthly;
         total += monthly;
         total *= (1 + monthlyRate);
-        months++;
-        if (months > 1000 * 12) break; // safety limit
+
+        labels.push(`Month ${months}`);
+        totalData.push(total.toFixed(2));
+        interestData.push((total - rawContributions).toFixed(2));
       }
 
       const years = Math.floor(months / 12);
@@ -56,6 +71,52 @@
 
       document.getElementById('result').innerText =
         `With ${annualRate}% annual interest, you'll reach €1,000,000 in about ${years} years and ${remainingMonths} months. 🚀`;
+
+      // Draw chart
+      if (chart) chart.destroy(); // clear previous chart
+
+      const ctx = document.getElementById('savingsChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Total Savings (€)',
+              data: totalData,
+              borderColor: '#2ecc71',
+              fill: false,
+              tension: 0.1
+            },
+            {
+              label: 'Interest Earned (€)',
+              data: interestData,
+              borderColor: '#e67e22',
+              fill: false,
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            title: {
+              display: true,
+              text: 'Savings Growth Over Time'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: '€ Amount' }
+            },
+            x: {
+              title: { display: true, text: 'Months' }
+            }
+          }
+        }
+      });
     }
   </script>
 </body>
